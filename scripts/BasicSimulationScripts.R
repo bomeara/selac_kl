@@ -44,7 +44,20 @@ SimulateData <- function(true.model, start.rep=1, end.rep=100, numgenes=5){
 #' @param true.model The result from a SelacOptimize() run
 #' @param data.dir Where the fasta files reside
 #' @return A selac object
-AnalyzeDataWithKnownValues <- function(true.model, data.dir) {
+AnalyzeDataEstimatingValues <- function(true.model, data.dir) {
+    result <- SelacOptimize(codon.data.path = data.dir, phy=true.model$phy, nuc.model=true.model$nuc.model)
+    return(result)
+}
+
+#' @title Analyze from simulated data with known values
+#'
+#' @description
+#' Loads and runs
+#'
+#' @param true.model The result from a SelacOptimize() run
+#' @param data.dir Where the fasta files reside
+#' @return A selac object
+AnalyzeDataKnownValues <- function(true.model, data.dir) {
     result <- SelacOptimize(codon.data.path = data.dir, phy=true.model$phy, nuc.model=true.model$nuc.model)
     return(result)
 }

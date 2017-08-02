@@ -11,6 +11,6 @@ rm(result)
 SimulateData(true.model=true.model, start.rep=start.rep, end.rep=end.rep)
 
 for (sim.index in start.rep:end.rep) {
-  result <- AnalyzeDataWithKnownValues(true.model, paste("fastaSet",sim.index, sep="_")
+  result <- AnalyzeDataEstimatingValues(true.model, paste0(paste("fastaSet",sim.index, sep="_"),'/'))
   save(result, file=paste0("SimResult_",sim.index,".rda"))
 }
