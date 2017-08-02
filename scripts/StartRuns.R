@@ -5,7 +5,7 @@ source("BasicSimulationScripts.R")
 load("../data/yeast.practiceSELACunrestgamma106.Rdata")
 
 start.rep = 1
-end.rep = 2
+end.rep = 20
 true.model = result
 rm(result)
 SimulateData(true.model=true.model, start.rep=start.rep, end.rep=end.rep)
