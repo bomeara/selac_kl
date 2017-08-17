@@ -1,10 +1,6 @@
 library(KLchecker)
 library(phangorn)
-
-data(Laurasiatherian)
-tree = nj(dist.ml(Laurasiatherian))
-fit = pml(tree, Laurasiatherian, k=4)
-fit = optim.pml(fit, optNni=TRUE, model="HKY", optGamma=TRUE)
+rm(list=ls())
 
 
 #
@@ -34,7 +30,7 @@ fit = optim.pml(fit, optNni=TRUE, model="HKY", optGamma=TRUE)
 #
 # NormVsExp <- EstimateKL(simulator.true.model, true.parameters, param.estimator.candidate.model, simulator.candidate.model, likelihood.data.with.true.model, likelihoods.data.with.candidate.model, K)
 
-true.parameters <- fit
+
 
 
 simulator.true.model <- function(parameters) {
@@ -56,7 +52,7 @@ likelihood.data.with.true.model <- function(data, fit) {
   fit$data <- data
   return(optim.pml(fit, optNni = FALSE, optBf = FALSE, optQ = FALSE,
   optInv = FALSE, optGamma = FALSE, optEdge = FALSE, optRate = FALSE,
-  optRooted = FALSE )$logLik)
+  optRooted = FALSE , max.it=0)$logLik)
 }
 
 likelihood.data.with.candidate.model <- function(data) {
@@ -66,4 +62,17 @@ likelihood.data.with.candidate.model <- function(data) {
 
 K <- 1
 
-JCvsHKY <- EstimateKL(simulator.true.model, true.parameters, param.estimator.candidate.model, simulator.candidate.model, likelihood.data.with.true.model, likelihoods.data.with.candidate.model, K, nrep.outer=5, nrep.inner=4)
+nchar.vector <- c(100, 1000, 3000)
+results <- data.frame()
+for (i in sequence(length(nchar.vector))) {
+  data(Laurasiatherian)
+  new.data <- Laurasiatherian
+  new.data <- as.phyDat(as.character(new.data)[,1:nchar.vector[i]])
+  tree = nj(dist.ml(new.data))
+  fit = pml(tree, new.data, k=4)
+  fit = optim.pml(fit, optNni=TRUE, model="HKY", optGamma=TRUE)
+  true.parameters <- fit
+  JCvsHKY <- EstimateKL(simulator.true.model, true.parameters, param.estimator.candidate.model, simulator.candidate.model, likelihood.data.with.true.model, likelihoods.data.with.candidate.model, K, nrep.outer=5, nrep.inner=4)
+  results <- rbind(results, data.frame(nchar=nchar.vector[i], KL=JCvsHKY[1], AIC=JCvsHKY[2]))
+  print(results)
+}
