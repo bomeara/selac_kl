@@ -1,5 +1,8 @@
 library(KLchecker)
 library(phangorn)
+library(ape)
+library(geiger)
+library(TreeSim)
 rm(list=ls())
 
 
@@ -41,7 +44,7 @@ simulator.true.model <- function(parameters) {
 
 
 param.estimator.candidate.model <- function(x) {
-  return(optim.pml(x, optNni=TRUE, model="JC", optGamma=TRUE))
+  return(optim.pml(x, optNni=FALSE, model="JC", optGamma=FALSE, optQ=TRUE, optBf=TRUE, optRate = TRUE))
 }
 
 simulator.candidate.model <- function(fit) {
@@ -62,17 +65,34 @@ likelihood.data.with.candidate.model <- function(data) {
 
 K <- 1
 
-nchar.vector <- c(100, 1000, 3000)
+nchar.vector <- c(100, 1000, 3000, 5000)
+ntax.vector <- c(25, 50, 100, 250)
 results <- data.frame()
-for (i in sequence(length(nchar.vector))) {
-  data(Laurasiatherian)
-  new.data <- Laurasiatherian
-  new.data <- as.phyDat(as.character(new.data)[,1:nchar.vector[i]])
-  tree = nj(dist.ml(new.data))
-  fit = pml(tree, new.data, k=4)
-  fit = optim.pml(fit, optNni=TRUE, model="HKY", optGamma=TRUE)
-  true.parameters <- fit
-  JCvsHKY <- EstimateKL(simulator.true.model, true.parameters, param.estimator.candidate.model, simulator.candidate.model, likelihood.data.with.true.model, likelihoods.data.with.candidate.model, K, nrep.outer=5, nrep.inner=4)
-  results <- rbind(results, data.frame(nchar=nchar.vector[i], KL=JCvsHKY[1], AIC=JCvsHKY[2]))
-  print(results)
+data(Laurasiatherian)
+seed.tree = nj(dist.ml(Laurasiatherian))
+seed.fit = pml(seed.tree, Laurasiatherian, k=1)
+seed.fit = optim.pml(seed.fit, optNni=TRUE, model="HKY", optQ=TRUE)
+
+for (rep in sequence(10)) {
+  for (i in sequence(length(nchar.vector))) {
+    for (j in sequence(length(ntax.vector))) {
+      #
+      #new.data <- Laurasiatherian
+    #  new.data <- as.phyDat(as.character(new.data)[,1:nchar.vector[i]])
+      #tree = nj(dist.ml(new.data))
+    #  tree <- geiger::drop.random(tree, Ntip(tree) - ntax.vector[j])
+      try({
+        tree <- TreeSim::sim.bd.taxa(n=ntax.vector[j], numbsim=1, lambda=1, mu=0.9, frac=0.5, complete=FALSE)[[1]]
+        tree$edge.lengths <- tree$edge.lengths/(max(branching.times(tree))) #so have less evolution
+        new.data <- phangorn::simSeq(x=tree, l=nchar.vector[i], Q=seed.fit$Q, bf=seed.fit$bf, type="DNA" , rate=0.01)
+        fit = pml(tree, new.data)
+        fit = optim.pml(fit, optNni=TRUE, model="HKY", optGamma=FALSE, optQ=TRUE)
+        true.parameters <- fit
+        JCvsHKY <- EstimateKL(simulator.true.model, true.parameters, param.estimator.candidate.model, simulator.candidate.model, likelihood.data.with.true.model, likelihoods.data.with.candidate.model, K, nrep.outer=50, nrep.inner=50)
+        results <- rbind(results, data.frame(nchar=nchar.vector[i], ntax=ntax.vector[j], KL=JCvsHKY[1], AIC=JCvsHKY[2], rep=rep))
+        save(results, file="~/Dropbox/KL.rda")
+        print(results)
+      })
+    }
+  }
 }
