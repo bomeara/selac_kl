@@ -22,7 +22,7 @@ best.model <- get.models(dredged.model, 1)[[1]]
 best.model.predictions <- predict(best.model)
 points(best.model.predictions, best.model$model$KL, pch=16, col=rgb(0,0,0,.5))
 dev.off()
-
+write.csv(dredged.model, file="AllModels.csv")
 all.tests <- list(
 cor.test.AIC = cor.test(results$KL, results$AIC),
 cor.test.AICc_ntax = cor.test(results$KL, results$AICc_ntax),
