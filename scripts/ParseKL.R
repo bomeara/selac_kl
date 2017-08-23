@@ -1,0 +1,38 @@
+setwd("/Users/bomeara/Documents/MyDocuments/GitClones/selac_kl/scripts")
+load("KL.rda")
+library(MuMIn)
+results$neg2lnL <- results$AIC - 2
+results$logNtax <- log(results$ntax)
+results$logNchar <- log(results$nchar)
+results.for.model <- results
+results.for.model$rep <- NULL
+results.for.model$AIC <- NULL
+results.for.model$K <- 1
+K=1
+results$AICc_ntax <- results$neg2lnL + 2 * K * (results$ntax / ( results$ntax - K - 1))
+results$AICc_nchar <- results$neg2lnL + 2 * K * (results$nchar / ( results$nchar - K - 1))
+
+options(na.action = "na.fail")
+global.model <- lm(KL ~ ., data=results.for.model)
+dredged.model <- MuMIn::dredge(global.model, beta="sd", m.lim=c(NA,3))
+pdf(file="BestModels.pdf")
+plot(results$AIC, results$KL, type="p", bty="n", pch=16, col=rgb(1,0,0,.5), log="xy",asp=1, xlab="estimator", ylab="KL")
+abline(a=0, b=1)
+best.model <- get.models(dredged.model, 1)[[1]]
+best.model.predictions <- predict(best.model)
+points(best.model.predictions, best.model$model$KL, pch=16, col=rgb(0,0,0,.5))
+dev.off()
+
+all.tests <- list(
+cor.test.AIC = cor.test(results$KL, results$AIC),
+cor.test.AICc_ntax = cor.test(results$KL, results$AICc_ntax),
+cor.test.AICc_nchar =  cor.test(results$KL, results$AICc_nchar),
+cor.test.best.model = cor.test(best.model$model$KL, predict(best.model))
+)
+
+print(lapply(all.tests, '[[', 'p.value'))
+print(best.model)
+
+
+
+

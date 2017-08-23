@@ -1,0 +1,84 @@
+
+R version 3.4.1 (2017-06-30) -- "Single Candle"
+Copyright (C) 2017 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin16.7.0 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> setwd("/Users/bomeara/Documents/MyDocuments/GitClones/selac_kl/scripts")
+> load("KL.rda")
+> library(MuMIn)
+> results$neg2lnL <- results$AIC - 2
+> results$logNtax <- log(results$ntax)
+> results$logNchar <- log(results$nchar)
+> results.for.model <- results
+> results.for.model$rep <- NULL
+> results.for.model$AIC <- NULL
+> results.for.model$K <- 1
+> K=1
+> results$AICc_ntax <- results$neg2lnL + 2 * K * (results$ntax / ( results$ntax - K - 1))
+> results$AICc_nchar <- results$neg2lnL + 2 * K * (results$nchar / ( results$nchar - K - 1))
+> 
+> options(na.action = "na.fail")
+> global.model <- lm(KL ~ ., data=results.for.model)
+> dredged.model <- MuMIn::dredge(global.model, beta="sd", m.lim=c(NA,3))
+Fixed term is "(Intercept)"
+> pdf(file="BestModels.pdf")
+> plot(results$AIC, results$KL, type="p", bty="n", pch=16, col=rgb(1,0,0,.5), log="xy",asp=1, xlab="estimator", ylab="KL")
+> abline(a=0, b=1)
+> best.model <- get.models(dredged.model, 1)[[1]]
+> best.model.predictions <- predict(best.model)
+> points(best.model.predictions, best.model$model$KL, pch=16, col=rgb(0,0,0,.5))
+> dev.off()
+null device 
+          1 
+> 
+> all.tests <- list(
++ cor.test.AIC = cor.test(results$KL, results$AIC),
++ cor.test.AICc_ntax = cor.test(results$KL, results$AICc_ntax),
++ cor.test.AICc_nchar =  cor.test(results$KL, results$AICc_nchar),
++ cor.test.best.model = cor.test(best.model$model$KL, predict(best.model))
++ )
+> 
+> print(lapply(all.tests, '[[', 'p.value'))
+$cor.test.AIC
+[1] 7.277869e-209
+
+$cor.test.AICc_ntax
+[1] 7.313054e-209
+
+$cor.test.AICc_nchar
+[1] 7.267472e-209
+
+$cor.test.best.model
+[1] 8.06744e-231
+
+> print(best.model)
+
+Call:
+lm(formula = KL ~ nchar + neg2lnL + ntax + 1, data = results.for.model)
+
+Coefficients:
+(Intercept)        nchar      neg2lnL         ntax  
+    27.2513      -0.1691       1.0622       1.7682  
+
+> 
+> 
+> 
+> 
+> 
+> proc.time()
+   user  system elapsed 
+  1.156   0.067   1.222 
