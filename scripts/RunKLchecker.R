@@ -65,8 +65,8 @@ likelihood.data.with.candidate.model <- function(data) {
 
 K <- 1
 
-nchar.vector <- c(100, 1000, 3000, 5000)
-ntax.vector <- c(25, 50, 100, 250)
+nchar.vector <- c(1,2,3,4,5,10,20,50,100,200,500,1000)
+ntax.vector <- c(5,10, 25, 50, 100, 250)
 results <- data.frame()
 data(Laurasiatherian)
 seed.tree = nj(dist.ml(Laurasiatherian))
@@ -90,7 +90,7 @@ for (rep in sequence(10)) {
         true.parameters <- fit
         JCvsHKY <- EstimateKL(simulator.true.model, true.parameters, param.estimator.candidate.model, simulator.candidate.model, likelihood.data.with.true.model, likelihoods.data.with.candidate.model, K, nrep.outer=50, nrep.inner=50)
         results <- rbind(results, data.frame(nchar=nchar.vector[i], ntax=ntax.vector[j], KL=JCvsHKY[1], AIC=JCvsHKY[2], rep=rep))
-        save(results, file="~/Dropbox/KL.rda")
+        save(results, file="KLrun2.rda")
         print(results)
       })
     }
