@@ -31,11 +31,13 @@ options(na.action = "na.fail")
 global.model <- lm(KLminusNeg2lnL ~ ., data=results.for.model)
 dredged.model <- MuMIn::dredge(global.model, beta="sd", m.lim=c(1,2))
 pdf(file="BestModels.pdf")
-plot(results$AIC, results$KL, type="p", bty="n", pch=16, col=rgb(1,0,0,.5), log="xy",asp=1, xlab="estimator", ylab="KL")
-abline(a=0, b=1)
+#plot(results$AIC, results$KLminusNeg2lnL, type="p", bty="n", pch=16, col=rgb(1,0,0,.5), log="xy",asp=1, xlab="estimator", ylab="KL")
+
 best.model <- get.models(dredged.model, 1)[[1]]
 best.model.predictions <- predict(best.model)
-points(best.model.predictions, best.model$model$KL, pch=16, col=rgb(0,0,0,.5))
+plot(best.model.predictions, best.model$model$KLminusNeg2lnL, pch=16, col=rgb(0,0,0,.5))
+abline(a=0, b=1)
+abline(h=2, col="red")
 dev.off()
 write.csv(dredged.model, file="AllModels.csv")
 # all.tests <- list(
