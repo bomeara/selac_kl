@@ -36,6 +36,7 @@ pdf(file="BestModels.pdf")
 best.model <- get.models(dredged.model, 1)[[1]]
 best.model.predictions <- predict(best.model)
 plot(best.model.predictions, best.model$model$KLminusNeg2lnL, pch=16, col=rgb(0,0,0,.5))
+points(results$AICc_nchar_penalty, best.model$model$KLminusNeg2lnL, pch=16, col=rgb(1,0,0,.5))
 abline(a=0, b=1)
 abline(h=2, col="red")
 dev.off()
