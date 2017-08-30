@@ -190,3 +190,7 @@ optimize edge weights:  -50602.74 --> -50602.74
 +     }
 +   }
 + }
+> 
+> proc.time()
+    user   system  elapsed 
+6773.767 1327.757 8221.462 
