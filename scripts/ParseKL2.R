@@ -7,6 +7,7 @@ results$logNchar <- log(results$nchar)
 results$NcharTimesNtax <- results$ntax * results$nchar
 results$LogNcharTimesNtax <- results$ntax * log(results$nchar)
 results$NcharTimesLogNtax <- log(results$ntax) * results$nchar
+results$LogNcharTimesLogNtax <- log(results$ntax) * log(results$nchar)
 
 K=1
 #results$AICc_ntax <- results$neg2lnL + 2 * K * (results$ntax / ( results$ntax - K - 1))
@@ -28,8 +29,9 @@ results.for.model$neg2lnL <- NULL
 
 
 options(na.action = "na.fail")
-global.model <- lm(KLminusNeg2lnL ~ ., data=results.for.model)
-dredged.model <- MuMIn::dredge(global.model, beta="sd", m.lim=c(1,2))
+global.model <- lm(KLminusNeg2lnL ~ AICc_ntax_penalty + AICc_nchar_penalty + AICc_ncharTimesntax_penalty + nchar + ntax + logNtax + logNchar + LogNcharTimesNtax + NcharTimesNtax + NcharTimesLogNtax + LogNcharTimesLogNtax - 1, data=results.for.model)
+#dredged.model <- MuMIn::dredge(global.model, beta="sd", m.lim=c(1,1))
+dredged.model <- MuMIn::dredge(global.model, m.lim=c(1,1))
 pdf(file="BestModels.pdf")
 #plot(results$AIC, results$KLminusNeg2lnL, type="p", bty="n", pch=16, col=rgb(1,0,0,.5), log="xy",asp=1, xlab="estimator", ylab="KL")
 
@@ -50,3 +52,4 @@ write.csv(dredged.model, file="AllModels.csv")
 
 #print(lapply(all.tests, '[[', 'p.value'))
 print(best.model)
+save(list=ls(), file="KLsummaryresults.rda")
