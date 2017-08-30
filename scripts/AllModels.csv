@@ -18,5 +18,7 @@ Type 'demo()' for some demos, 'help()' for on-line help, or
 Type 'q()' to quit R.
 
 > library(KLchecker)
-Error in library(KLchecker) : there is no package called ‘KLchecker’
+> library(phangorn)
+Loading required package: ape
+
 Execution halted
