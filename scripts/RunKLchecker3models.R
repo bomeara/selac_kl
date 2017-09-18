@@ -32,7 +32,7 @@ rm(list=ls())
 #
 # K <- 1
 #
-# NormVsExp <- EstimateKL(simulator.true.model, true.parameters, param.estimator.candidate.model, simulator.candidate.model, likelihood.data.with.true.model, likelihoods.data.with.candidate.model, K)
+# NormVsExp <- EstimateKL(simulator.true.model, true.parameters, param.estimator.candidate.model, simulator.candidate.model, likelihood.data.with.true.model, likelihood.data.with.candidate.model, K)
 
 
 
@@ -45,11 +45,11 @@ simulator.true.model <- function(parameters) {
 
 
 param.estimator.candidate.model.JC <- function(x) {
-  return(optim.pml(x, optNni=FALSE, model="JC", optGamma=FALSE, optQ=TRUE, optBf=TRUE, optRate = TRUE))
+  return(optim.pml(x, optNni=FALSE, model="JC", optGamma=FALSE, optQ=TRUE, optBf=TRUE, optRate = TRUE, optRooted=TRUE))
 }
 
 param.estimator.candidate.model.HKY <- function(x) {
-  return(optim.pml(x, optNni=FALSE, model="HKY", optGamma=FALSE, optQ=TRUE, optBf=TRUE, optRate = TRUE))
+  return(optim.pml(x, optNni=FALSE, model="HKY", optGamma=FALSE, optQ=TRUE, optBf=TRUE, optRate = TRUE, optRooted=TRUE))
 }
 
 simulator.candidate.model <- function(fit) {
@@ -63,17 +63,23 @@ likelihood.data.with.true.model <- function(data, fit) {
   optRooted = FALSE , max.it=0)$logLik)
 }
 
-likelihood.data.with.candidate.model <- function(data) {
-
-  return(param.estimator.candidate.model(data)$logLik)
+likelihood.data.with.candidate.model.HKY <- function(data) {
+  return(param.estimator.candidate.model.HKY(data)$logLik)
 }
 
 
-RunIndividual <- function(model.K.vector, k.index, param.estimator.candidate.model.JC, param.estimator.candidate.model.HKY, TreeSim, sim.bd.taxa, ntax.vector, j, phangorn, simSeq, nchar.vector, i, seed.fit, simulator.true.model, simulator.candidate.model, likelihood.data.with.true.model, likelihoods.data.with.candidate.model, results, rep) {
+likelihood.data.with.candidate.model.JC <- function(data) {
+  return(param.estimator.candidate.model.JC(data)$logLik)
+}
+
+
+RunIndividual <- function(model.K.vector, k.index, param.estimator.candidate.model.JC, param.estimator.candidate.model.HKY, TreeSim, sim.bd.taxa, ntax.vector, j, phangorn, simSeq, nchar.vector, i, seed.fit, simulator.true.model, simulator.candidate.model, likelihood.data.with.true.model, likelihood.data.with.candidate.model.JC,  likelihood.data.with.candidate.model.HKY, results, rep) {
     K <- model.K.vector[k.index]
     param.estimator.candidate.model <- param.estimator.candidate.model.JC
+    likelihood.data.with.candidate.model <- likelihood.data.with.candidate.model.JC
     if(k.index==2) {
         param.estimator.candidate.model <- param.estimator.candidate.model.HKY
+        likelihood.data.with.candidate.model <- likelihood.data.with.candidate.model.HKY
     }
     new.data <- NULL
     tree <- NULL
@@ -83,7 +89,7 @@ RunIndividual <- function(model.K.vector, k.index, param.estimator.candidate.mod
     tree <- TreeSim::sim.bd.taxa(n=ntax.vector[j], numbsim=1, lambda=1, mu=0.9, frac=0.5, complete=FALSE)[[1]]
     tree$edge.length <-  tree$edge.length/(max(branching.times(tree))) #so have less evolution; if too little, starts adding more
     new.data <- phangorn::simSeq(x=tree, l=nchar.vector[i], Q=seed.fit$Q, bf=seed.fit$bf, type="DNA" , rate=0.01 * attempts)
-    nrew.new.data <- nrow(as.character(unique(new.data)))
+    nrow.new.data <- nrow(as.character(unique(new.data)))
     attempts <- attempts+1
     #print(attempts)
     #      if(attempts>=50) {
@@ -95,7 +101,7 @@ RunIndividual <- function(model.K.vector, k.index, param.estimator.candidate.mod
     
     fit = optim.pml(fit, optNni=FALSE, model="GTR", optGamma=FALSE, optQ=TRUE)
     true.parameters <- fit
-    model.comparison <- EstimateKL(simulator.true.model, true.parameters, param.estimator.candidate.model, simulator.candidate.model, likelihood.data.with.true.model, likelihoods.data.with.candidate.model, K, nrep.outer=50, nrep.inner=50)
+    model.comparison <- EstimateKL(simulator.true.model=simulator.true.model, true.parameters=true.parameters, param.estimator.candidate.model=param.estimator.candidate.model, simulator.candidate.model=simulator.candidate.model, likelihood.data.with.true.model=likelihood.data.with.true.model, likelihoods.data.with.candidate.model=likelihood.data.with.candidate.model, K=K, nrep.outer=50, nrep.inner=50)
     results <- rbind(results, data.frame(nchar=nchar.vector[i], ntax=ntax.vector[j], KL=model.comparison[1], AIC=model.comparison[2], rep=rep, K=K))
     save(results, file="KLrun3model.rda")
     print(results)
@@ -122,7 +128,7 @@ for (rep in sequence(10)) {
         #tree = nj(dist.ml(new.data))
       #  tree <- geiger::drop.random(tree, Ntip(tree) - ntax.vector[j])
           results.this <- NULL
-        try(results.this <- RunIndividual(model.K.vector, k.index, param.estimator.candidate.model.JC, param.estimator.candidate.model.HKY, TreeSim, sim.bd.taxa, ntax.vector, j, phangorn, simSeq, nchar.vector, i, seed.fit, simulator.true.model, simulator.candidate.model, likelihood.data.with.true.model, likelihoods.data.with.candidate.model, results, rep))
+        try(results.this <- RunIndividual(model.K.vector=model.K.vector, k.index=k.index, param.estimator.candidate.model.JC=param.estimator.candidate.model.JC, param.estimator.candidate.model.HKY=param.estimator.candidate.model.HKY, TreeSim=TreeSim, sim.bd.taxa=sim.bd.taxa, ntax.vector=ntax.vector, j=j, phangorn=phangorn, simSeq=simSeq, nchar.vector=nchar.vector, i=i, seed.fit=seed.fit, simulator.true.model=simulator.true.model, simulator.candidate.model=simulator.candidate.model, likelihood.data.with.true.model=likelihood.data.with.true.model, likelihood.data.with.candidate.model.JC=likelihood.data.with.candidate.model.JC, likelihood.data.with.candidate.model.HKY=likelihood.data.with.candidate.model.HKY, results=results, rep=rep))
           if(!is.null(results.this)) {
             results <- results.this   
           }
