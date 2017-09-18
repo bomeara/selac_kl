@@ -45,11 +45,11 @@ simulator.true.model <- function(parameters) {
 
 
 param.estimator.candidate.model.JC <- function(x) {
-  return(optim.pml(x, optNni=FALSE, model="JC", optGamma=FALSE, optQ=TRUE, optBf=TRUE, optRate = TRUE, optRooted=TRUE))
+  return(optim.pml(x, optEdge=FALSE, optNni=FALSE, model="JC", optGamma=FALSE, optQ=TRUE, optBf=TRUE, optRate = FALSE, optRooted=TRUE))
 }
 
 param.estimator.candidate.model.HKY <- function(x) {
-  return(optim.pml(x, optNni=FALSE, model="HKY", optGamma=FALSE, optQ=TRUE, optBf=TRUE, optRate = TRUE, optRooted=TRUE))
+  return(optim.pml(x, optEdge=TRUE, optNni=FALSE, model="HKY", optGamma=FALSE, optQ=TRUE, optBf=TRUE, optRate = FALSE, optRooted=TRUE))
 }
 
 simulator.candidate.model <- function(fit) {
@@ -99,7 +99,7 @@ RunIndividual <- function(model.K.vector, k.index, param.estimator.candidate.mod
     #    if(!is.null(new.data)) {
     fit = pml(tree, new.data)
     
-    fit = optim.pml(fit, optNni=FALSE, model="GTR", optGamma=FALSE, optQ=TRUE)
+    fit = optim.pml(fit, optRooted=TRUE, optNni=FALSE, model="GTR", optGamma=FALSE, optQ=TRUE)
     true.parameters <- fit
     model.comparison <- EstimateKL(simulator.true.model=simulator.true.model, true.parameters=true.parameters, param.estimator.candidate.model=param.estimator.candidate.model, simulator.candidate.model=simulator.candidate.model, likelihood.data.with.true.model=likelihood.data.with.true.model, likelihoods.data.with.candidate.model=likelihood.data.with.candidate.model, K=K, nrep.outer=50, nrep.inner=50)
     results <- rbind(results, data.frame(nchar=nchar.vector[i], ntax=ntax.vector[j], KL=model.comparison[1], AIC=model.comparison[2], rep=rep, K=K))
@@ -113,9 +113,9 @@ ntax.vector <- c(4,5,6,7,8,9,10, 25, 50, 100)
 results <- data.frame()
 data(Laurasiatherian)
 model.K.vector <- c(1,2)
-seed.tree = nj(dist.ml(Laurasiatherian))
+seed.tree = upgma(dist.ml(Laurasiatherian))
 seed.fit = pml(seed.tree, Laurasiatherian, k=1)
-seed.fit = optim.pml(seed.fit, optNni=TRUE, model="GTR", optQ=TRUE)
+seed.fit = optim.pml(seed.fit, optRooted=TRUE, optNni=TRUE, model="GTR", optQ=TRUE)
 
 for (rep in sequence(10)) {
   for (i in sequence(length(nchar.vector))) {
