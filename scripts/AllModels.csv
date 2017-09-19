@@ -1,24 +1,12 @@
-
-R version 3.4.1 (2017-06-30) -- "Single Candle"
-Copyright (C) 2017 The R Foundation for Statistical Computing
-Platform: x86_64-apple-darwin16.7.0 (64-bit)
-
-R is free software and comes with ABSOLUTELY NO WARRANTY.
-You are welcome to redistribute it under certain conditions.
-Type 'license()' or 'licence()' for distribution details.
-
-  Natural language support but running in an English locale
-
-R is a collaborative project with many contributors.
-Type 'contributors()' for more information and
-'citation()' on how to cite R or R packages in publications.
-
-Type 'demo()' for some demos, 'help()' for on-line help, or
-'help.start()' for an HTML browser interface to help.
-Type 'q()' to quit R.
-
-> library(KLchecker)
-> library(phangorn)
-Loading required package: ape
-
-Execution halted
+"","AICc_nchar_penalty","AICc_ncharTimesntax_penalty","AICc_ntax_penalty","logNchar","LogNcharTimesLogNtax","LogNcharTimesNtax","logNtax","nchar","NcharTimesLogNtax","NcharTimesNtax","ntax","df","logLik","AICc","delta","weight"
+"513",NA,NA,NA,NA,NA,NA,NA,NA,NA,0.0274064844100277,NA,2,-3574.12837702965,7152.27788081986,0,1
+"257",NA,NA,NA,NA,NA,NA,NA,NA,0.691437699212303,NA,NA,2,-4481.55102883131,8967.12318442318,1814.84530360332,0
+"33",NA,NA,NA,NA,NA,1.99192891219844,NA,NA,NA,NA,NA,2,-4501.74256468443,9007.50625612943,1855.22837530957,0
+"17",NA,NA,NA,NA,50.6059915725441,NA,NA,NA,NA,NA,NA,2,-4637.49857576099,9279.01827828254,2126.74039746268,0
+"129",NA,NA,NA,NA,NA,NA,NA,2.01755780267248,NA,NA,NA,2,-4675.12942042266,9354.27996760589,2202.00208678603,0
+"9",NA,NA,NA,150.313590365724,NA,NA,NA,NA,NA,NA,NA,2,-4729.934503021,9463.89013280256,2311.6122519827,0
+"1025",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,4.8069764829777,2,-4741.29178055723,9486.60468787501,2334.32680705516,0
+"65",NA,NA,NA,NA,NA,NA,132.647183427599,NA,NA,NA,NA,2,-4763.28668302595,9530.59449281247,2378.31661199261,0
+"3",NA,217.186400131024,NA,NA,NA,NA,NA,NA,NA,NA,NA,2,-4787.70320839165,9579.42754354385,2427.149662724,0
+"5",NA,NA,172.857511973865,NA,NA,NA,NA,NA,NA,NA,NA,2,-4796.19297837213,9596.40708350483,2444.12920268497,0
+"2",2.90141391007871e-05,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,2,-4832.58936011294,9669.19984698644,2516.92196616658,0
