@@ -11,7 +11,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Choosing the correct Akaike penalty term
 
-The AICc is a corrected AIC for small sample size. However, there remains an unaddressed question in phylogenetics regarding what exactly sample size is. For comparative methods, it is taken as number of taxa, as when comparing Ornstein-Uhlenbeck models (Butler and King, 2004; O'Meara et al. 2006; Beaulieu et al. 2012) or discrete character models (corhmm_____). For evaluating molecular models, it is taken as number of sites (Posada _____). These cannot both be true; especially for discrete models, where the underlying model is ultimately the same between DNA and other discrete traits. 
+The AICc is a corrected AIC for small sample size; it is supposed to better estimate Kullback-Leibler distance. However, there remains an unaddressed question in phylogenetics regarding what exactly sample size is. For comparative methods, it is taken as number of taxa, as when comparing Ornstein-Uhlenbeck models (Butler and King, 2004; O'Meara et al. 2006; Beaulieu et al. 2012) or discrete character models (corhmm_____). For evaluating molecular models, it is taken as number of sites (Posada _____). These cannot both be true; especially for discrete models, where the underlying model is ultimately the same between DNA and other discrete traits.
+
+Jhwueng et al (____) investigated AIC and related measures of KL distance and found no consistent best option. They used a two stage simulation approach to estimate KL distance. This has since been implemented in the [KLchecker package](https://github.com/bomeara/KLchecker). We used this approach to examine two 
 
 ```{r cars}
 summary(cars)
