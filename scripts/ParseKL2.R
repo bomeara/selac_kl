@@ -15,7 +15,8 @@ K=1
 #results$AICc_ncharTimesntax <- results$neg2lnL + 2 * K * (results$nchar*results$ntax / ( results$nchar*results$ntax - K - 1))
 results$AICc_ntax_penalty <-  2 * K * (results$ntax / ( results$ntax - K - 1))
 results$AICc_nchar_penalty <- 2 * K * (results$nchar / ( results$nchar - K - 1))
-results$AICc_nchar_penalty[which(!is.finite(results$AICc_nchar_penalty ))] <- 1e6
+#results$AICc_nchar_penalty[which(!is.finite(results$AICc_nchar_penalty ))] <- 1e6
+results$AICc_nchar_penalty[which(!is.finite(results$AICc_nchar_penalty ))] <- NA
 results$AICc_ncharTimesntax_penalty <-  2 * K * (results$nchar*results$ntax / ( results$nchar*results$ntax - K - 1))
 results$KLminusNeg2lnL <- results$KL - results$neg2lnL
 
@@ -27,6 +28,8 @@ results.for.model$K <- rep(1, nrow(results.for.model))
 results.for.model$KL <- NULL
 results.for.model$neg2lnL <- NULL
 
+results.for.model <- results.for.model[!is.na(results.for.model$AICc_nchar_penalty),]
+
 
 options(na.action = "na.fail")
 global.model <- lm(KLminusNeg2lnL ~ AICc_ntax_penalty + AICc_nchar_penalty + AICc_ncharTimesntax_penalty + nchar + ntax + logNtax + logNchar + LogNcharTimesNtax + NcharTimesNtax + NcharTimesLogNtax + LogNcharTimesLogNtax - 1, data=results.for.model)
@@ -37,8 +40,9 @@ pdf(file="BestModels.pdf")
 
 best.model <- get.models(dredged.model, 1)[[1]]
 best.model.predictions <- predict(best.model)
+aicc_nchar.predictions <- predict(lm(KLminusNeg2lnL ~  AICc_nchar_penalty - 1, data=results.for.model))
 plot(best.model.predictions, best.model$model$KLminusNeg2lnL, pch=16, col=rgb(0,0,0,.5))
-points(results$AICc_nchar_penalty, best.model$model$KLminusNeg2lnL, pch=16, col=rgb(1,0,0,.5))
+points(aicc_nchar.predictions, best.model$model$KLminusNeg2lnL, pch=16, col=rgb(1,0,0,.5))
 abline(a=0, b=1)
 abline(h=2, col="red")
 dev.off()
